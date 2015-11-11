@@ -29,8 +29,8 @@ THE SOFTWARE. */
     constructor: function(options, ready) {
       Tech.call(this, options, ready);
 
-      this.setPoster(options.poster);
-      this.setSrc(this.options_.source, true);
+      this.setPoster(this.options_.poster);
+      this.setSource(this.options_.source, true);
 
       // Set the vjs-youtube class to the player
       // Parent is not set yet so we have to wait a tick
@@ -286,6 +286,10 @@ THE SOFTWARE. */
     },
 
     setSrc: function(source) {
+      this.setSource(source);
+    },
+
+    setSource: function(source) {
       if (!source || !source.src) {
         return;
       }
