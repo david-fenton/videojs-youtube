@@ -9,16 +9,16 @@
         controls
         autoplay
         width="640" height="264"
-        data-setup='{ "techOrder": ["youtube"] }'
+        data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=xjS6SftYQaQ"}] }'
 >
 </video>
 
 <script src="../node_modules/video.js/dist/video.min.js"></script>
 <script src="../dist/Youtube.min.js"></script>
 <script>
-    videojs('vid1').ready(function() {
-       this.src({ type: "video/youtube", src: "https://www.youtube.com/watch?v=xjS6SftYQaQ"});
-    });
+    setTimeout(function() {
+        videojs('vid1').src({ type: "video/youtube", src: "https://www.youtube.com/watch?v=-y11kJzwe4Y"});
+    }, 10000);
 </script>
 </body>
 </html>
