@@ -1,43 +1,32 @@
 /* The MIT License (MIT)
 
-Copyright (c) 2014-2015 Benoit Tremblay <trembl.ben@gmail.com>
+ Copyright (c) 2014-2015 Benoit Tremblay <trembl.ben@gmail.com>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-/*global define, YT*/
-(function (root, factory) {
-  if(typeof define === 'function' && define.amd) {
-    define(['videojs'], function(videojs){
-      return (root.Youtube = factory(videojs));
-    });
-  } else if(typeof module === 'object' && module.exports) {
-    module.exports = (root.Youtube = factory(require('video.js')));
-  } else {
-    root.Youtube = factory(root.videojs);
-  }
-}(this, function(videojs) {
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE. */
+(function () {
   'use strict';
 
   var Tech = videojs.getComponent('Tech');
 
   var Youtube = videojs.extend(Tech, {
 
-    constructor: function(options, ready) {
+    constructor: function (options, ready) {
       Tech.call(this, options, ready);
 
       this.setPoster(this.options_.poster);
@@ -45,7 +34,7 @@ THE SOFTWARE. */
 
       // Set the vjs-youtube class to the player
       // Parent is not set yet so we have to wait a tick
-      setTimeout(function() {
+      setTimeout(function () {
         this.el_.parentNode.className += ' vjs-youtube';
 
         if (_isOnMobile) {
@@ -60,13 +49,13 @@ THE SOFTWARE. */
       }.bind(this));
     },
 
-    dispose: function() {
+    dispose: function () {
       this.el_.parentNode.className = this.el_.parentNode.className
         .replace(' vjs-youtube', '')
         .replace(' vjs-youtube-mobile', '');
     },
 
-    createEl: function() {
+    createEl: function () {
       var div = document.createElement('div');
       div.setAttribute('id', this.options_.techId);
       div.setAttribute('style', 'width:100%;height:100%;top:0;left:0;position:absolute');
@@ -80,7 +69,7 @@ THE SOFTWARE. */
         divBlocker.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%');
 
         // In case the blocker is still there and we want to pause
-        divBlocker.onclick = function() {
+        divBlocker.onclick = function () {
           this.pause();
         }.bind(this);
 
@@ -90,7 +79,7 @@ THE SOFTWARE. */
       return divWrapper;
     },
 
-    initYTPlayer: function() {
+    initYTPlayer: function () {
       var playerVars = {
         controls: 0,
         modestbranding: 1,
@@ -203,7 +192,7 @@ THE SOFTWARE. */
       });
     },
 
-    onPlayerReady: function() {
+    onPlayerReady: function () {
       this.playerReady_ = true;
       this.triggerReady();
 
@@ -212,11 +201,11 @@ THE SOFTWARE. */
       }
     },
 
-    onPlayerPlaybackQualityChange: function() {
+    onPlayerPlaybackQualityChange: function () {
 
     },
 
-    onPlayerStateChange: function(e) {
+    onPlayerStateChange: function (e) {
       var state = e.data;
 
       if (state === this.lastState) {
@@ -262,7 +251,7 @@ THE SOFTWARE. */
       this.lastState = state;
     },
 
-    onPlayerError: function(e) {
+    onPlayerError: function (e) {
       this.errorNumber = e.data;
       this.trigger('error');
 
@@ -271,35 +260,35 @@ THE SOFTWARE. */
       this.ytPlayer = null;
     },
 
-    error: function() {
+    error: function () {
       switch (this.errorNumber) {
         case 2:
-          return { code: 'Unable to find the video' };
+          return {code: 'Unable to find the video'};
 
         case 5:
-          return { code: 'Error while trying to play the video' };
+          return {code: 'Error while trying to play the video'};
 
         case 100:
-          return { code: 'Unable to find the video' };
+          return {code: 'Unable to find the video'};
 
         case 101:
         case 150:
-          return { code: 'Playback on other Websites has been disabled by the video owner.' };
+          return {code: 'Playback on other Websites has been disabled by the video owner.'};
       }
 
-      return { code: 'YouTube unknown error (' + this.errorNumber + ')' };
+      return {code: 'YouTube unknown error (' + this.errorNumber + ')'};
     },
 
-    src: function(src) {
+    src: function (src) {
       if (src) {
-        this.setSrc({ src: src });
+        this.setSrc({src: src});
         this.play();
       }
 
       return this.source;
     },
 
-    poster: function() {
+    poster: function () {
       // You can't start programmaticlly a video with a mobile
       // through the iframe so we hide the poster and the play button (with CSS)
       if (_isOnMobile) {
@@ -309,11 +298,11 @@ THE SOFTWARE. */
       return this.poster_;
     },
 
-    setPoster: function(poster) {
+    setPoster: function (poster) {
       this.poster_ = poster;
     },
 
-    setSrc: function(source) {
+    setSrc: function (source) {
       if (!source || !source.src) {
         return;
       }
@@ -340,7 +329,7 @@ THE SOFTWARE. */
       }
     },
 
-    play: function() {
+    play: function () {
       if (!this.url || !this.url.videoId) {
         return;
       }
@@ -367,23 +356,23 @@ THE SOFTWARE. */
       }
     },
 
-    pause: function() {
+    pause: function () {
       if (this.ytPlayer) {
         this.ytPlayer.pauseVideo();
       }
     },
 
-    paused: function() {
+    paused: function () {
       return (this.ytPlayer) ?
         (this.lastState !== YT.PlayerState.PLAYING && this.lastState !== YT.PlayerState.BUFFERING)
         : true;
     },
 
-    currentTime: function() {
+    currentTime: function () {
       return this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0;
     },
 
-    setCurrentTime: function(seconds) {
+    setCurrentTime: function (seconds) {
       if (this.lastState === YT.PlayerState.PAUSED) {
         this.timeBeforeSeek = this.currentTime();
       }
@@ -401,7 +390,7 @@ THE SOFTWARE. */
       // so run an interval timer to look for the currentTime to change
       if (this.lastState === YT.PlayerState.PAUSED && this.timeBeforeSeek !== seconds) {
         clearInterval(this.checkSeekedInPauseInterval);
-        this.checkSeekedInPauseInterval = setInterval(function() {
+        this.checkSeekedInPauseInterval = setInterval(function () {
           if (this.lastState !== YT.PlayerState.PAUSED || !this.isSeeking) {
             // If something changed while we were waiting for the currentTime to change,
             //  clear the interval timer
@@ -414,7 +403,7 @@ THE SOFTWARE. */
       }
     },
 
-    onSeeked: function() {
+    onSeeked: function () {
       clearInterval(this.checkSeekedInPauseInterval);
       this.trigger('seeked');
       this.isSeeking = false;
@@ -423,11 +412,11 @@ THE SOFTWARE. */
       }
     },
 
-    playbackRate: function() {
+    playbackRate: function () {
       return this.ytPlayer ? this.ytPlayer.getPlaybackRate() : 1;
     },
 
-    setPlaybackRate: function(suggestedRate) {
+    setPlaybackRate: function (suggestedRate) {
       if (!this.ytPlayer) {
         return;
       }
@@ -436,43 +425,43 @@ THE SOFTWARE. */
       this.trigger('ratechange');
     },
 
-    duration: function() {
+    duration: function () {
       return this.ytPlayer ? this.ytPlayer.getDuration() : 0;
     },
 
-    currentSrc: function() {
+    currentSrc: function () {
       return this.source;
     },
 
-    ended: function() {
+    ended: function () {
       return this.ytPlayer ? (this.lastState === YT.PlayerState.ENDED) : false;
     },
 
-    volume: function() {
+    volume: function () {
       return this.ytPlayer ? this.ytPlayer.getVolume() / 100.0 : 1;
     },
 
-    setVolume: function(percentAsDecimal) {
+    setVolume: function (percentAsDecimal) {
       if (!this.ytPlayer) {
         return;
       }
 
       this.ytPlayer.setVolume(percentAsDecimal * 100.0);
-      this.setTimeout( function(){
+      this.setTimeout(function () {
         this.trigger('volumechange');
       }, 50);
 
     },
 
-    muted: function() {
+    muted: function () {
       return this.ytPlayer ? this.ytPlayer.isMuted() : false;
     },
 
-    setMuted: function(mute) {
+    setMuted: function (mute) {
       if (!this.ytPlayer) {
         return;
       }
-      else{
+      else {
         this.muted(true);
       }
 
@@ -481,19 +470,19 @@ THE SOFTWARE. */
       } else {
         this.ytPlayer.unMute();
       }
-      this.setTimeout( function(){
+      this.setTimeout(function () {
         this.trigger('volumechange');
       }, 50);
     },
 
-    buffered: function() {
-      if(!this.ytPlayer || !this.ytPlayer.getVideoLoadedFraction) {
+    buffered: function () {
+      if (!this.ytPlayer || !this.ytPlayer.getVideoLoadedFraction) {
         return {
           length: 0,
-          start: function() {
+          start: function () {
             throw new Error('This TimeRanges object is empty');
           },
-          end: function() {
+          end: function () {
             throw new Error('This TimeRanges object is empty');
           }
         };
@@ -503,29 +492,33 @@ THE SOFTWARE. */
 
       return {
         length: 1,
-        start: function() { return 0; },
-        end: function() { return end; }
+        start: function () {
+          return 0;
+        },
+        end: function () {
+          return end;
+        }
       };
     },
 
-    supportsFullScreen: function() {
+    supportsFullScreen: function () {
       return true;
     },
 
     // Tries to get the highest resolution thumbnail available for the video
-    checkHighResPoster: function(){
+    checkHighResPoster: function () {
       var uri = 'https://img.youtube.com/vi/' + this.url.videoId + '/maxresdefault.jpg';
 
       try {
         var image = new Image();
-        image.onload = function(){
+        image.onload = function () {
           // Onload may still be called if YouTube returns the 120x90 error thumbnail
-          if('naturalHeight' in image){
-            if(image.naturalHeight <= 90 || image.naturalWidth <= 120) {
+          if ('naturalHeight' in image) {
+            if (image.naturalHeight <= 90 || image.naturalWidth <= 120) {
               this.onerror();
               return;
             }
-          } else if(image.height <= 90 || image.width <= 120) {
+          } else if (image.height <= 90 || image.width <= 120) {
             this.onerror();
             return;
           }
@@ -533,24 +526,26 @@ THE SOFTWARE. */
           this.poster_ = uri;
           this.trigger('posterchange');
         }.bind(this);
-        image.onerror = function(){};
+        image.onerror = function () {
+        };
         image.src = uri;
       }
-      catch(e){}
+      catch (e) {
+      }
     }
   });
 
-  Youtube.isSupported = function() {
+  Youtube.isSupported = function () {
     return true;
   };
 
-  Youtube.canPlaySource = function(e) {
+  Youtube.canPlaySource = function (e) {
     return (e.type === 'video/youtube');
   };
 
   var _isOnMobile = /(iPad|iPhone|iPod|Android)/g.test(navigator.userAgent);
 
-  Youtube.parseUrl = function(url) {
+  Youtube.parseUrl = function (url) {
     var result = {
       videoId: null
     };
@@ -565,7 +560,7 @@ THE SOFTWARE. */
     var regPlaylist = /[?&]list=([^#\&\?]+)/;
     match = url.match(regPlaylist);
 
-    if(match && match[1]) {
+    if (match && match[1]) {
       result.listId = match[1];
     }
 
@@ -581,17 +576,17 @@ THE SOFTWARE. */
 
   function injectCss() {
     var css = // iframe blocker to catch mouse events
-              '.vjs-youtube .vjs-iframe-blocker { display: none; }' +
-              '.vjs-youtube.vjs-user-inactive .vjs-iframe-blocker { display: block; }' +
-              '.vjs-youtube .vjs-poster { background-size: cover; }' +
-              '.vjs-youtube-mobile .vjs-big-play-button { display: none; }';
+      '.vjs-youtube .vjs-iframe-blocker { display: none; }' +
+      '.vjs-youtube.vjs-user-inactive .vjs-iframe-blocker { display: block; }' +
+      '.vjs-youtube .vjs-poster { background-size: cover; }' +
+      '.vjs-youtube-mobile .vjs-big-play-button { display: none; }';
 
     var head = document.head || document.getElementsByTagName('head')[0];
 
     var style = document.createElement('style');
     style.type = 'text/css';
 
-    if (style.styleSheet){
+    if (style.styleSheet) {
       style.styleSheet.cssText = css;
     } else {
       style.appendChild(document.createTextNode(css));
@@ -602,7 +597,7 @@ THE SOFTWARE. */
 
   Youtube.apiReadyQueue = [];
 
-  window.onYouTubeIframeAPIReady = function() {
+  window.onYouTubeIframeAPIReady = function () {
     Youtube.isApiReady = true;
 
     for (var i = 0; i < Youtube.apiReadyQueue.length; ++i) {
@@ -614,4 +609,4 @@ THE SOFTWARE. */
   injectCss();
 
   videojs.registerTech('Youtube', Youtube);
-}));
+})();
