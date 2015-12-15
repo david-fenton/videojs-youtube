@@ -19,7 +19,18 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE. */
-(function() {
+/*global define, YT*/
+(function (root, factory) {
+  if(typeof define === 'function' && define.amd) {
+    define(['videojs'], function(videojs){
+      return (root.Youtube = factory(videojs));
+    });
+  } else if(typeof module === 'object' && module.exports) {
+    module.exports = (root.Youtube = factory(require('video.js')));
+  } else {
+    root.Youtube = factory(root.videojs);
+  }
+}(this, function(videojs) {
   'use strict';
 
   var Tech = videojs.getComponent('Tech');
@@ -37,6 +48,10 @@ THE SOFTWARE. */
       setTimeout(function() {
         this.el_.parentNode.className += ' vjs-youtube';
 
+        if (_isOnMobile) {
+          this.el_.parentNode.className += ' vjs-youtube-mobile';
+        }
+
         if (Youtube.isApiReady) {
           this.initYTPlayer();
         } else {
@@ -46,7 +61,9 @@ THE SOFTWARE. */
     },
 
     dispose: function() {
-      this.el_.parentNode.className = this.el_.parentNode.className.replace(' vjs-youtube', '');
+      this.el_.parentNode.className = this.el_.parentNode.className
+        .replace(' vjs-youtube', '')
+        .replace(' vjs-youtube-mobile', '');
     },
 
     createEl: function() {
@@ -55,7 +72,6 @@ THE SOFTWARE. */
       div.setAttribute('style', 'width:100%;height:100%;top:0;left:0;position:absolute');
 
       var divWrapper = document.createElement('div');
-      divWrapper.setAttribute('style', 'width:100%;height:100%;position:relative');
       divWrapper.appendChild(div);
 
       if (!_isOnMobile && !this.options_.ytControls) {
@@ -209,6 +225,7 @@ THE SOFTWARE. */
 
       switch (state) {
         case -1:
+          this.trigger('loadedmetadata');
           this.trigger('durationchange');
           break;
 
@@ -273,11 +290,22 @@ THE SOFTWARE. */
       return { code: 'YouTube unknown error (' + this.errorNumber + ')' };
     },
 
-    src: function() {
+    src: function(src) {
+      if (src) {
+        this.setSrc({ src: src });
+        this.play();
+      }
+
       return this.source;
     },
 
     poster: function() {
+      // You can't start programmaticlly a video with a mobile
+      // through the iframe so we hide the poster and the play button (with CSS)
+      if (_isOnMobile) {
+        return null;
+      }
+
       return this.poster_;
     },
 
@@ -286,10 +314,6 @@ THE SOFTWARE. */
     },
 
     setSrc: function(source) {
-      this.setSource(source);
-    },
-
-    setSource: function(source) {
       if (!source || !source.src) {
         return;
       }
@@ -329,7 +353,9 @@ THE SOFTWARE. */
             this.ytPlayer.loadPlaylist(this.url.listId);
             this.activeList = this.url.listId;
           }
-        } if (this.activeVideoId === this.url.videoId) {
+        }
+
+        if (this.activeVideoId === this.url.videoId) {
           this.ytPlayer.playVideo();
         } else {
           this.ytPlayer.loadVideoById(this.url.videoId);
@@ -494,12 +520,12 @@ THE SOFTWARE. */
         var image = new Image();
         image.onload = function(){
           // Onload may still be called if YouTube returns the 120x90 error thumbnail
-          if('naturalHeight' in this){
-            if(this.naturalHeight <= 90 || this.naturalWidth <= 120) {
+          if('naturalHeight' in image){
+            if(image.naturalHeight <= 90 || image.naturalWidth <= 120) {
               this.onerror();
               return;
             }
-          } else if(this.height <= 90 || this.width <= 120) {
+          } else if(image.height <= 90 || image.width <= 120) {
             this.onerror();
             return;
           }
@@ -557,7 +583,8 @@ THE SOFTWARE. */
     var css = // iframe blocker to catch mouse events
               '.vjs-youtube .vjs-iframe-blocker { display: none; }' +
               '.vjs-youtube.vjs-user-inactive .vjs-iframe-blocker { display: block; }' +
-              '.vjs-youtube .vjs-poster { background-size: cover; }';
+              '.vjs-youtube .vjs-poster { background-size: cover; }' +
+              '.vjs-youtube-mobile .vjs-big-play-button { display: none; }';
 
     var head = document.head || document.getElementsByTagName('head')[0];
 
@@ -587,4 +614,4 @@ THE SOFTWARE. */
   injectCss();
 
   videojs.registerTech('Youtube', Youtube);
-})();
+}));

@@ -3,6 +3,9 @@
 ## Install
 You can use bower (`bower install videojs-youtube`), npm (`npm install videojs-youtube`) or the source and build it using `npm run build`. Then, the only file you need is dist/Youtube.min.js.
 
+## Version Note
+Use branch `vjs4` if you still using old VideoJS `v4.x`.
+
 ## Example
 ```html
 <!DOCTYPE html>
@@ -48,7 +51,7 @@ It supports every regular Video.js options. Additionally, you can change any [Yo
   controls
   autoplay
   width="640" height="264"
-  data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=xjS6SftYQaQ"}], "Youtube": { "iv_load_policy": 1 } }'
+  data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=xjS6SftYQaQ"}], "youtube": { "iv_load_policy": 1 } }'
 >
 </video>
 ```
@@ -63,7 +66,7 @@ Because `controls` is already a Video.js option, to use the YouTube controls, yo
   controls
   autoplay
   width="640" height="264"
-  data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=xjS6SftYQaQ"}], "Youtube": { "ytControls": 2 } }'
+  data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=xjS6SftYQaQ"}], "youtube": { "ytControls": 2 } }'
 >
 </video>
 ```
