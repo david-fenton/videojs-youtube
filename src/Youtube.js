@@ -586,5 +586,5 @@ THE SOFTWARE. */
   loadApi();
   injectCss();
 
-  videojs.registerComponent('Youtube', Youtube);
+  videojs.registerTech('Youtube', Youtube);
 })();
