@@ -41,7 +41,7 @@ THE SOFTWARE. */
       Tech.call(this, options, ready);
 
       this.setPoster(this.options_.poster);
-      this.setSource(this.options_.source, true);
+      this.setSrc(this.options_.source, true);
 
       // Set the vjs-youtube class to the player
       // Parent is not set yet so we have to wait a tick
