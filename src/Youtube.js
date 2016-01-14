@@ -187,7 +187,8 @@
           onReady: this.onPlayerReady.bind(this),
           onPlaybackQualityChange: this.onPlayerPlaybackQualityChange.bind(this),
           onStateChange: this.onPlayerStateChange.bind(this),
-          onError: this.onPlayerError.bind(this)
+          onError: this.onPlayerError.bind(this),
+          onApiChange: this.onPlayerApiChange.bind(this)
         }
       });
     },
@@ -277,6 +278,11 @@
       }
 
       return {code: 'YouTube unknown error (' + this.errorNumber + ')'};
+    },
+
+    onPlayerApiChange: function (event) {
+      this.ytPlayer.unloadModule('cc');
+      this.ytPlayer.unloadModule('captions');
     },
 
     src: function (src) {
