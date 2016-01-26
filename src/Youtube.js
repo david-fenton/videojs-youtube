@@ -256,9 +256,9 @@
       this.errorNumber = e.data;
       this.trigger('error');
 
-      this.ytPlayer.stopVideo();
-      this.ytPlayer.destroy();
-      this.ytPlayer = null;
+      //this.ytPlayer.stopVideo();
+      //this.ytPlayer.destroy();
+      //this.ytPlayer = null;
     },
 
     error: function () {
