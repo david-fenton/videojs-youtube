@@ -292,7 +292,7 @@ THE SOFTWARE. */
 
     src: function(src) {
       if (src) {
-        this.setSrc({ src: src });
+        this.setSource(src);
         this.play();
       }
 
@@ -311,6 +311,15 @@ THE SOFTWARE. */
 
     setPoster: function(poster) {
       this.poster_ = poster;
+    },
+
+    setSource: function (source) {
+      if(!source || !source.src) {
+        return;
+      }
+
+      this.setSrc(source);
+      this.play();
     },
 
     setSrc: function(source) {
@@ -350,7 +359,7 @@ THE SOFTWARE. */
           if (this.activeList === this.url.listId) {
             this.ytPlayer.playVideo();
           } else {
-            this.ytPlayer.loadPlaylist(this.url.listId);
+            this.ytPlayer.loadPlaylist(this.url.listId, this.source.index !== undefined ? this.source.index : 0, this.source.startSeconds !== undefined ? this.source.startSeconds : 0);
             this.activeList = this.url.listId;
           }
         }
@@ -358,7 +367,7 @@ THE SOFTWARE. */
         if (this.activeVideoId === this.url.videoId) {
           this.ytPlayer.playVideo();
         } else {
-          this.ytPlayer.loadVideoById(this.url.videoId);
+          this.ytPlayer.loadVideoById(this.url.videoId, this.source.startSeconds !== undefined ? this.source.startSeconds : 0);
           this.activeVideoId = this.url.videoId;
         }
       } else {
