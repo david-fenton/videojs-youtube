@@ -280,7 +280,7 @@
       return {code: 'YouTube unknown error (' + this.errorNumber + ')'};
     },
 
-    onPlayerApiChange: function (event) {
+    onPlayerApiChange: function () {
       this.ytPlayer.unloadModule('cc');
       this.ytPlayer.unloadModule('captions');
     },
@@ -354,7 +354,9 @@
           if (this.activeList === this.url.listId) {
             this.ytPlayer.playVideo();
           } else {
-            this.ytPlayer.loadPlaylist(this.url.listId, this.source.index !== undefined ? this.source.index : 0, this.source.startSeconds !== undefined ? this.source.startSeconds : 0);
+            this.ytPlayer.loadPlaylist(this.url.listId,
+              this.source.index !== undefined ? this.source.index : 0,
+              this.source.startSeconds !== undefined ? this.source.startSeconds : 0);
             this.activeList = this.url.listId;
             this.trigger('loadstart');
           }
@@ -363,7 +365,8 @@
         if (this.activeVideoId === this.url.videoId) {
           this.ytPlayer.playVideo();
         } else {
-          this.ytPlayer.loadVideoById(this.url.videoId, this.source.startSeconds !== undefined ? this.source.startSeconds : 0);
+          this.ytPlayer.loadVideoById(this.url.videoId,
+            this.source.startSeconds !== undefined ? this.source.startSeconds : 0);
           this.activeVideoId = this.url.videoId;
           this.trigger('loadstart');
         }
@@ -527,23 +530,26 @@
       var uri = 'https://img.youtube.com/vi/' + this.url.videoId + '/maxresdefault.jpg';
 
       try {
+        //var self = this;
         var image = new Image();
         image.onload = function () {
           // Onload may still be called if YouTube returns the 120x90 error thumbnail
           if ('naturalHeight' in image) {
             if (image.naturalHeight <= 90 || image.naturalWidth <= 120) {
-              this.onerror();
+              //if(self.ytPlayer.onError) self.onError();
+              this.onError();
               return;
             }
           } else if (image.height <= 90 || image.width <= 120) {
-            this.onerror();
+              //if(self.ytPlayer.onError) self.onError();
+            this.onError();
             return;
           }
 
           this.poster_ = uri;
           this.trigger('posterchange');
         }.bind(this);
-        image.onerror = function () {
+        image.onError = function () {
         };
         image.src = uri;
       }
