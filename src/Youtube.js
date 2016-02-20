@@ -12,14 +12,25 @@
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE. */
-(function () {
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE. */
+/*global define, YT*/
+(function (root, factory) {
+  if(typeof define === 'function' && define.amd) {
+    define(['video.js'], function(videojs){
+      return (root.Youtube = factory(videojs));
+    });
+  } else if(typeof module === 'object' && module.exports) {
+    module.exports = (root.Youtube = factory(require('video.js')));
+  } else {
+    root.Youtube = factory(root.videojs);
+  }
+}(this, function(videojs) {
   'use strict';
 
   var Tech = videojs.getComponent('Tech');
@@ -209,7 +220,7 @@
     onPlayerStateChange: function (e) {
       var state = e.data;
 
-      if (state === this.lastState) {
+      if (state === this.lastState || this.errorNumber) {
         return;
       }
 
@@ -263,18 +274,14 @@
 
     error: function () {
       switch (this.errorNumber) {
-        case 2:
-          return {code: 'Unable to find the video'};
-
         case 5:
           return {code: 'Error while trying to play the video'};
-
+        case 2:
         case 100:
-          return {code: 'Unable to find the video'};
-
-        case 101:
         case 150:
-          return {code: 'Playback on other Websites has been disabled by the video owner.'};
+          return { code: 'Unable to find the video' };
+        case 101:
+          return { code: 'Playback on other Websites has been disabled by the video owner.' };
       }
 
       return {code: 'YouTube unknown error (' + this.errorNumber + ')'};
@@ -287,8 +294,11 @@
 
     src: function (src) {
       if (src) {
-        this.setSource(src);
-        this.play();
+        this.setSrc({ src: src });
+
+        if (this.options_.autoplay && !_isOnMobile) {
+          this.play();
+        }
       }
 
       return this.source;
@@ -309,12 +319,13 @@
     },
 
     setSource: function (source) {
-      if(!source || !source.src) {
-        return;
+      this.setSrc(source);
+
+      if (this.options_.autoplay && !_isOnMobile) {
+        this.play();
       }
 
-      this.setSrc(source);
-      this.play();
+      return this;
     },
 
     setSrc: function (source) {
@@ -322,6 +333,7 @@
         return;
       }
 
+      delete this.errorNumber;
       this.source = source;
       this.url = Youtube.parseUrl(source.src);
 
@@ -348,6 +360,8 @@
       if (!this.url || !this.url.videoId) {
         return;
       }
+
+      this.wasPausedBeforeSeek = false;
 
       if (this.isReady_) {
         if (this.url.listId) {
@@ -425,11 +439,13 @@
 
     onSeeked: function () {
       clearInterval(this.checkSeekedInPauseInterval);
-      this.trigger('seeked');
       this.isSeeking = false;
+
       if (this.wasPausedBeforeSeek) {
         this.pause();
       }
+
+      this.trigger('seeked');
     },
 
     playbackRate: function () {
@@ -511,15 +527,15 @@
       var end = this.ytPlayer.getVideoLoadedFraction() * this.ytPlayer.getDuration();
 
       return {
-        length: 1,
-        start: function () {
-          return 0;
-        },
-        end: function () {
-          return end;
-        }
+        length: this.ytPlayer.getDuration(),
+        start: function() { return 0; },
+        end: function() { return end; }
       };
     },
+
+    // TODO: Can we really do something with this on YouTUbe?
+    load: function() {},
+    reset: function() {},
 
     supportsFullScreen: function () {
       return true;
@@ -530,19 +546,14 @@
       var uri = 'https://img.youtube.com/vi/' + this.url.videoId + '/maxresdefault.jpg';
 
       try {
-        //var self = this;
         var image = new Image();
         image.onload = function () {
           // Onload may still be called if YouTube returns the 120x90 error thumbnail
-          if ('naturalHeight' in image) {
+          if('naturalHeight' in image){
             if (image.naturalHeight <= 90 || image.naturalWidth <= 120) {
-              //if(self.ytPlayer.onError) self.onError();
-              this.onError();
               return;
             }
-          } else if (image.height <= 90 || image.width <= 120) {
-              //if(self.ytPlayer.onError) self.onError();
-            this.onError();
+          } else if(image.height <= 90 || image.width <= 120) {
             return;
           }
 
@@ -631,5 +642,10 @@
   loadApi();
   injectCss();
 
-  videojs.registerTech('Youtube', Youtube);
-})();
+  // Older versions of VJS5 doesn't have the registerTech function
+  if (typeof videojs.registerTech !== 'undefined') {
+    videojs.registerTech('Youtube', Youtube);
+  } else {
+    videojs.registerComponent('Youtube', Youtube);
+  }
+}));
