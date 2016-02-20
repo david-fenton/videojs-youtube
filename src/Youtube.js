@@ -12,25 +12,14 @@
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE. */
-/*global define, YT*/
-(function (root, factory) {
-  if(typeof define === 'function' && define.amd) {
-    define(['video.js'], function(videojs){
-      return (root.Youtube = factory(videojs));
-    });
-  } else if(typeof module === 'object' && module.exports) {
-    module.exports = (root.Youtube = factory(require('video.js')));
-  } else {
-    root.Youtube = factory(root.videojs);
-  }
-}(this, function(videojs) {
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE. */
+(function () {
   'use strict';
 
   var Tech = videojs.getComponent('Tech');
@@ -295,10 +284,6 @@ THE SOFTWARE. */
     src: function (src) {
       if (src) {
         this.setSrc({ src: src });
-
-        if (this.options_.autoplay && !_isOnMobile) {
-          this.play();
-        }
       }
 
       return this.source;
@@ -320,10 +305,6 @@ THE SOFTWARE. */
 
     setSource: function (source) {
       this.setSrc(source);
-
-      if (this.options_.autoplay && !_isOnMobile) {
-        this.play();
-      }
 
       return this;
     },
@@ -642,10 +623,5 @@ THE SOFTWARE. */
   loadApi();
   injectCss();
 
-  // Older versions of VJS5 doesn't have the registerTech function
-  if (typeof videojs.registerTech !== 'undefined') {
-    videojs.registerTech('Youtube', Youtube);
-  } else {
-    videojs.registerComponent('Youtube', Youtube);
-  }
-}));
+  videojs.registerTech('Youtube', Youtube);
+})();
