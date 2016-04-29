@@ -352,8 +352,7 @@
             this.ytPlayer.loadPlaylist(this.url.listId,
               this.source.index !== undefined ? this.source.index : 0,
               this.source.startSeconds !== undefined ? this.source.startSeconds : 0);
-            this.activeList = this.url.listId;
-            this.trigger('loadstart');
+              this.activeList = this.url.listId;
           }
         }
 
@@ -363,7 +362,6 @@
           this.ytPlayer.loadVideoById(this.url.videoId,
             this.source.startSeconds !== undefined ? this.source.startSeconds : 0);
           this.activeVideoId = this.url.videoId;
-          this.trigger('loadstart');
         }
       } else {
         this.trigger('waiting');
@@ -545,8 +543,7 @@
         };
         image.src = uri;
       }
-      catch (e) {
-      }
+      catch (e) {}
     }
   });
 
@@ -554,8 +551,12 @@
     return true;
   };
 
-  Youtube.canPlaySource = function (e) {
-    return (e.type === 'video/youtube');
+  Youtube.canPlaySource = function(e) {
+    return Youtube.canPlayType(e.type);
+  };
+
+  Youtube.canPlayType = function(e) {
+    return (e === 'video/youtube');
   };
 
   var _isOnMobile = /(iPad|iPhone|iPod|Android)/g.test(navigator.userAgent);
