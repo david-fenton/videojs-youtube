@@ -264,13 +264,14 @@
     error: function () {
       switch (this.errorNumber) {
         case 5:
-          return {code: 'Error while trying to play the video'};
+          return {code: 'Error while trying to play the video.'};
         case 2:
+          return {code: 'Invalid video ID.'};
         case 100:
-        case 150:
-          return { code: 'Unable to find the video' };
+          return {code: 'Unable to find the video.'};
         case 101:
-          return { code: 'Playback on other Websites has been disabled by the video owner.' };
+        case 150:
+          return {code: 'Playback on other Websites has been disabled by the video owner.'};
       }
 
       return {code: 'YouTube unknown error (' + this.errorNumber + ')'};
